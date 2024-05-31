@@ -1,27 +1,31 @@
 import React from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import 'swiper/css';
-import 'swiper/css/navigation';
-import { Navigation } from 'swiper/modules';
+import { auth } from '../firebase';
 import '../styles/style.css';
-import { auth, provider } from '../firebase';
-import { signInWithPopup } from 'firebase/auth';
 
 const Header = ({ user, onSignIn, onSignOut }) => {
 
   const handleSignIn = async (e) => {
     e.preventDefault();
     try {
-      await signInWithPopup(auth, provider);
+      await onSignIn();
     } catch (error) {
       console.error("Error signing in with Google:", error);
+    }
+  };
+
+  const handleSignOut = async (e) => {
+    e.preventDefault();
+    try {
+      await onSignOut();
+    } catch (error) {
+      console.error("Error signing out:", error);
     }
   };
 
   return (
     <header className="header">
       <a href="#" className="logo">
-        <i className="fas fa-paw"></i> zoo
+        <i className="fas fa-paw"></i> Animalia
       </a>
       <nav className="navbar">
         <a href="#home">Home</a>
@@ -31,7 +35,8 @@ const Header = ({ user, onSignIn, onSignOut }) => {
         <a href="#contact">Contact</a>
       </nav>
       <div className="icons">
-        <div id="login-btn" className="fas fa-user" onClick={user ? onSignOut : handleSignIn}></div>
+        {user && <span className="user-name">Welcome, {user.displayName}</span>}
+        <div id="login-btn" className="fas fa-user" onClick={user ? handleSignOut : handleSignIn}></div>
         <div id="menu-btn" className="fas fa-bars"></div>
       </div>
       <form className="login-form">
@@ -39,7 +44,7 @@ const Header = ({ user, onSignIn, onSignOut }) => {
         {user ? (
           <>
             <p>Welcome, {user.displayName}</p>
-            <button type="button" className="btn" onClick={onSignOut}>Logout</button>
+            <button type="button" className="btn" onClick={handleSignOut}>Logout</button>
           </>
         ) : (
           <>
